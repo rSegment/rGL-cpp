@@ -78,6 +78,7 @@
     <ResourceCompile Include="rGLcpp.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="gl3w.c" />
     <ClCompile Include="rGL.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

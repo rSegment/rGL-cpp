@@ -1,5 +1,8 @@
-﻿#include <GL/glfw.h>	  //Includes gl.h & glu.h
+﻿#include <iostream>
 #include <stdlib.h>
+
+#include <GL3/gl3w.h>		// GL3w must be included before any other OpenGL related headers
+#include <GL/glfw.h>		//Includes gl.h & glu.h
 
 
 int main(void){
@@ -8,7 +11,7 @@ int main(void){
 	0.Indicates that the program is running and initializes a timer in 0s
 	*********************/
 	int running= GL_TRUE;
-	GLdouble time=0;
+	GLdouble time=0.0f;
 	glfwSetTime(0);
 	/**********************
 	1.Initializes glfw parts that are not dependent on a window, such as threading, timer and joystick input. or else exits
@@ -53,6 +56,29 @@ int main(void){
 
 	 glfwSetWindowTitle( "rGL" );										//sets window title "rGL"
 
+
+
+	 /**********************
+	4. gl3wInit			
+	Must right after the context windows had started
+
+	***********************/
+
+
+
+	 if (gl3wInit()) {
+		 fprintf(stderr, "failed to initialize OpenGL\n");
+		 return -1;
+	 }
+
+
+
+
+
+
+	 std::cout << "OpenGL " << glGetString(GL_VERSION) << "\nGLSL "  << glGetString(GL_SHADING_LANGUAGE_VERSION);		// OpenGL and GL SHADING LANGUAGE VERSION
+
+	 glClearColor(0,0,1,0);								// ClearScreenColor glClearColor( GLfloat   red,   GLfloat   green,   GLfloat   blue,  GLfloat   alpha) values are in 0,1 range 
 
 
 
