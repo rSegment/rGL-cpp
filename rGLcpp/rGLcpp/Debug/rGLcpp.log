@@ -1,0 +1,5 @@
+﻿  rGL.cpp
+rGL.obj : error LNK2019: unresolved external symbol _glfwInit referenced in function _main
+rGL.obj : error LNK2019: unresolved external symbol _glfwTerminate referenced in function _main
+rGL.obj : error LNK2019: unresolved external symbol _glfwOpenWindow referenced in function _main
+C:\Users\Rui Orey\cpp-backend\rGLcpp\Debug\rGLcpp.exe : fatal error LNK1120: 3 unresolved externals

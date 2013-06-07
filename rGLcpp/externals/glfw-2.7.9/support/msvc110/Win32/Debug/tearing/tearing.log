@@ -1,0 +1,4 @@
+﻿  tearing.c
+c:\users\rui orey\cpp-backend\rglcpp\externals\glfw-2.7.9\tests\tearing.c(46): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+          c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdio.h(357) : see declaration of 'sprintf'
+  tearing.vcxproj -> C:\Users\Rui Orey\cpp-backend\rGLcpp\externals\glfw-2.7.9\support\msvc110\..\..\tests\tearing_debug.exe
