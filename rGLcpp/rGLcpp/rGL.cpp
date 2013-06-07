@@ -5,10 +5,11 @@
 int main(void){
 
 	/*********************
-	0.Indicates that the program is running
+	0.Indicates that the program is running and initializes a timer in 0s
 	*********************/
 	int running= GL_TRUE;
-	
+	GLdouble time=0;
+	glfwSetTime(0);
 	/**********************
 	1.Initializes glfw parts that are not dependent on a window, such as threading, timer and joystick input. or else exits
 	***********************/
@@ -44,15 +45,34 @@ int main(void){
 	************************/
 	
 	
-	if( !glfwOpenWindow( 300,300, 0,0,0,0,0,0, GLFW_WINDOW ) )
+	if( !glfwOpenWindow( 800,600, 0,0,0,0,0,0, GLFW_WINDOW ) )			// a 800x600 window is created with default color bits (RGB) and alpha,depth and stencil disabled 
 		{
 		glfwTerminate();
 		exit( EXIT_FAILURE );
 		}
 
-	
+	 glfwSetWindowTitle( "rGL" );										//sets window title "rGL"
 
 
+
+
+
+	/**********************
+	3. Main Loop
+	***********************/
+
+while( running )
+{
+// OpenGL rendering goes here...
+
+
+glClear( GL_COLOR_BUFFER_BIT );							// Clear the buffers currently enabled for color writing(BUFFER BIT - can be OR'ed with GL_DEPTH_BUFFER_BIT and GL_STENCIL_BUFFER_BIT if used). 
+
+glfwSwapBuffers();										// Swap front and back rendering buffers. GLFW is by default double buffered
+														
+running = !glfwGetKey( GLFW_KEY_ESC ) &&				// Check if ESC key was pressed or window was closed
+glfwGetWindowParam( GLFW_OPENED );
+}
 
 
 
