@@ -9,13 +9,17 @@
 
 using namespace glm;
 
-int main(void){
+GLuint running;
+GLdouble time;
 
-	/*********************
+
+int init(void){
+
+/*********************
 	0.Indicates that the program is running and initializes a timer in 0s
 	*********************/
-	int running= GL_TRUE;
-	GLdouble time=0.0f;
+	running= GL_TRUE;
+	time=0.0f;
 	glfwSetTime(0);
 	/**********************
 	1.Initializes glfw parts that are not dependent on a window, such as threading, timer and joystick input. or else exits
@@ -51,6 +55,12 @@ int main(void){
 	int depthbits, int stencilbits->related to depth_buffer and stencil_buffer but in what way?
 	************************/
 
+	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 2); // 2x antialiasing - should be optional in final version
+	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); // We want OpenGL 3.2
+	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
+	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
+ 
+
 
 	if( !glfwOpenWindow( 800,600, 0,0,0,0,0,0, GLFW_WINDOW ) )			// a 800x600 window is created with default color bits (RGB) and alpha,depth and stencil disabled 
 	{
@@ -63,7 +73,7 @@ int main(void){
 
 
 	/**********************
-	4. gl3wInit			
+	3. gl3wInit			
 	Must right after the context windows had started
 
 	***********************/
@@ -87,17 +97,23 @@ int main(void){
 	std::cout << "GLSL: "  << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl; 		// OpenGL and GL SHADING LANGUAGE VERSION
 	std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;       
 	std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl; 
+	
+	return 0;
+}
+
+int main(void){
+
+	init();
 	glClearColor(0,1,0,0);							// ClearScreenColor glClearColor( GLfloat   red,   GLfloat   green,   GLfloat   blue,  GLfloat   alpha) values are in 0,1 range 
 
-
-
-
 	/**********************
-	3. Main Loop
+	4. Main Loop
 	***********************/
 
 	while( running )
 	{
+		
+		
 		// OpenGL rendering goes here...
 
 
