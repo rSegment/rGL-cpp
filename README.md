@@ -1,3 +1,3 @@
-# C++ Implementation of rGL Engine
+# C++ Implementation of rGL
 
-The implementation of the graphical engine backend for the rGL project with the D programming language.
+OpenGL 3.2 implemented and explored with the C++ programming language.
