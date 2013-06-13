@@ -1,8 +1,6 @@
 ﻿#include <iostream>
 #include <stdlib.h>
 
-
-
 #include <GL3/gl3w.h>		// GL3w must be included before any other OpenGL related headers
 #include <GL/glfw.h>		//Includes gl.h & glu.h
 #include <glm/glm.hpp>		// OpenGL Mathematics
@@ -140,7 +138,15 @@ int main(void){
 	while( running )
 	{
 		
+
+		// 2b
+		glBindBuffer(GL_ARRAY_BUFFER,positionBufferObject);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,0,0);	
 		
+		//
+
+
 		// OpenGL rendering goes here...
 
 
@@ -158,7 +164,8 @@ int main(void){
 	/*********************************
 	Last.This releases any resources allocated by GLFW, closes the window if it is open and kills any secondary threads created by GLFWA˙ fter this call, you must call glfwInit again before using any GLFW functions).
 	*********************************/
-
+	glBindBuffer(GL_ARRAY_BUFFER,0);
+	glDisableVertexAttribArray(0);
 	glfwTerminate();                        	
 	return 0;
 }
