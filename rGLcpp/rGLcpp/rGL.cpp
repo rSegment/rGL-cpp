@@ -12,8 +12,33 @@ using namespace glm;
 GLuint running;
 GLdouble time;
 
+/*********************
+Step 2b 
+*********************/
+
+
+//Global Variables
+GLuint positionBufferObject;					//This will store the handle to the first buffer object
+const float vertexPositions[]={					//The vertexes of the triangle
+    0.75f, 0.75f, 0.0f, 1.0f,					
+    0.75f, -0.75f, 0.0f, 1.0f,
+    -0.75f, -0.75f, 0.0f, 1.0f,
+};
+
+// VBO Function
+
+void InitializeVertexBuffer(){
+	glGenBuffers(1,&positionBufferObject);													//generates 1 buffer object and puts his handle in positionBufferObject
+	glBindBuffer(GL_ARRAY_BUFFER,positionBufferObject);										// binds a VBO as a bindig target of GL_ARRAY_BUFFER
+	glBufferData(GL_ARRAY_BUFFER,sizeof(vertexPositions),vertexPositions,GL_STATIC_DRAW);  // for the binded target to GL_ARRAY_BUFFER, allocates memory and then saves on the GPU vertexPositions
+	glBindBuffer(GL_ARRAY_BUFFER,0);														//unbinds gl_array_buffer							
+}
+
+
 
 int init(void){
+
+
 
 /*********************
 	0.Indicates that the program is running and initializes a timer in 0s
@@ -104,6 +129,8 @@ int init(void){
 int main(void){
 
 	init();
+	InitializeVertexBuffer();						//2b. calls VBO creation function
+
 	glClearColor(0,1,0,0);							// ClearScreenColor glClearColor( GLfloat   red,   GLfloat   green,   GLfloat   blue,  GLfloat   alpha) values are in 0,1 range 
 
 	/**********************
