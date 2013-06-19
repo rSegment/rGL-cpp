@@ -1,5 +1,11 @@
 ﻿#include <iostream>
 #include <stdlib.h>
+#include <string>
+
+#include <fstream>
+#include <vector>
+ 
+
 
 #include <GL3/gl3w.h>		// GL3w must be included before any other OpenGL related headers
 #include <GL/glfw.h>		//Includes gl.h & glu.h
@@ -13,23 +19,133 @@ GLdouble time;
 /*********************
 Step 2b 
 *********************/
-
-
-//Global Variables
-GLuint positionBufferObject;					//This will store the handle to the first buffer object
-const float vertexPositions[]={					//The vertexes of the triangle
-    0.75f, 0.75f, 0.0f, 1.0f,					
+const GLfloat vertexPositions[]={
+    0.75f, 0.75f, 0.0f, 1.0f,
     0.75f, -0.75f, 0.0f, 1.0f,
     -0.75f, -0.75f, 0.0f, 1.0f,
 };
 
+//Global Variables
+GLuint vao = 0;
+GLuint positionBufferObject;					//This will store the handle to the first buffer object
+
+
+
+
+// Check Errors simple function
+
+void checkError(const char *functionName)
+{
+	GLenum error;
+	while (( error = glGetError() ) != GL_NO_ERROR) {
+		fprintf (stderr, "OpenGL error 0x%X found in %s\n", error, functionName);
+	}
+}
+
+
+// Shader pointers
+GLuint vs;
+GLuint fs;
+GLuint program;     // points to shader 
+
+
+
+// Shaderdump
+
+std::string readFile(const char *filePath) {
+
+     std::string content;
+     std::ifstream fileStream(filePath, std::ios::in);
+
+     if(!fileStream.is_open()) {
+         std::cerr << "Could not read file " << filePath << ". File does not exist." << std::endl;
+         return "";
+     }
+
+     std::string line = "";
+     while(!fileStream.eof()) {
+         std::getline(fileStream, line);
+         content.append(line + "\n");
+     }
+
+     fileStream.close();
+     return content;
+}
+
+
+ GLuint LoadShader(const char *vertex_path, const char *fragment_path) {
+     GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+     GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	 // Read shaders
+     std::string vertShaderStr = readFile(vertex_path);
+     std::string fragShaderStr = readFile(fragment_path);
+     const char *vertShaderSrc = vertShaderStr.c_str();
+     const char *fragShaderSrc = fragShaderStr.c_str();
+
+
+     GLint result = GL_FALSE;
+     int logLength;
+
+
+     // Compile vertex shader
+     std::cout << "Compiling vertex shader." << std::endl;
+     
+	 glShaderSource(vertShader, 1, &vertShaderSrc, NULL);
+     glCompileShader(vertShader);
+	 
+
+     // Check vertex shader
+     glGetShaderiv(vertShader, GL_COMPILE_STATUS, &result);
+     glGetShaderiv(vertShader, GL_INFO_LOG_LENGTH, &logLength);
+     std::vector<char> vertShaderError(logLength);
+     glGetShaderInfoLog(vertShader, logLength, NULL, &vertShaderError[0]);
+     std::cout << &vertShaderError[0] << std::endl;
+	 printf("Aqui\n");
+
+     // Compile fragment shader
+     std::cout << "Compiling fragment shader." << std::endl;
+     glShaderSource(fragShader, 1, &fragShaderSrc, NULL);
+     glCompileShader(fragShader);
+
+     // Check fragment shader
+     glGetShaderiv(fragShader, GL_COMPILE_STATUS, &result);
+     glGetShaderiv(fragShader, GL_INFO_LOG_LENGTH, &logLength);
+     std::vector<char> fragShaderError(logLength);
+     glGetShaderInfoLog(fragShader, logLength, NULL, &fragShaderError[0]);
+     std::cout << &fragShaderError[0] << std::endl;
+
+
+     std::cout << "Linking program" << std::endl;
+     GLuint program = glCreateProgram();
+     glAttachShader(program, vertShader);
+     glAttachShader(program, fragShader);
+     glLinkProgram(program);
+
+     glGetProgramiv(program, GL_LINK_STATUS, &result);
+     glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+     std::vector<char> programError( (logLength > 1) ? logLength : 1 );
+     glGetProgramInfoLog(program, logLength, NULL, &programError[0]);
+     std::cout << &programError[0] << std::endl;
+
+     glDeleteShader(vertShader);
+     glDeleteShader(fragShader);
+
+     return program;
+}
+
+
 // VBO Function
 
 void InitializeVertexBuffer(){
+	
+	glGenVertexArrays (1, &vao);
+	glBindVertexArray (vao);
+
 	glGenBuffers(1,&positionBufferObject);													//generates 1 buffer object and puts his handle in positionBufferObject
 	glBindBuffer(GL_ARRAY_BUFFER,positionBufferObject);										// binds a VBO as a bindig target of GL_ARRAY_BUFFER
-	glBufferData(GL_ARRAY_BUFFER,sizeof(vertexPositions),vertexPositions,GL_STATIC_DRAW);  // for the binded target to GL_ARRAY_BUFFER, allocates memory and then saves on the GPU vertexPositions
+	glBufferData(GL_ARRAY_BUFFER,sizeof(vertexPositions),vertexPositions,GL_STATIC_DRAW);  // at last, for the binded target to GL_ARRAY_BUFFER, allocates memory and then saves on the GPU vertexPositions
 	glBindBuffer(GL_ARRAY_BUFFER,0);														//unbinds gl_array_buffer							
+	checkError("InitializeVertexBuffer");
 }
 
 
@@ -80,7 +196,7 @@ int init(void){
 
 	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 2); // 2x antialiasing - should be optional in final version
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); // We want OpenGL 3.2
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
+	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
  
 
@@ -109,7 +225,7 @@ int init(void){
 	}
 
 
-	if (!gl3wIsSupported(4, 0)) {
+	if (!gl3wIsSupported(3, 3)) {
 		std::cerr << "OpenGL 4.0 not supported" << std::endl;
 		return -1;
 	} 
@@ -121,15 +237,37 @@ int init(void){
 	std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;       
 	std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl; 
 	
+
+	checkError("init");
+
 	return 0;
+
 }
 
 int main(void){
 
+
+	
+
 	init();
 	InitializeVertexBuffer();						//2b. calls VBO creation function
 
-	glClearColor(0,1,0,0);							// ClearScreenColor glClearColor( GLfloat   red,   GLfloat   green,   GLfloat   blue,  GLfloat   alpha) values are in 0,1 range 
+	program = LoadShader("../shaders/vs.glsl", "../shaders/fs.glsl");						//Loads shaders to GPU
+
+	glClearColor(0,1,0,1);							// ClearScreenColor glClearColor( GLfloat   red,   GLfloat   green,   GLfloat   blue,  GLfloat   alpha) values are in 0,1 range 
+
+		// 2b
+
+	glUseProgram(program);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER,positionBufferObject);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,0,0);		// No need to specify from wihich buffer data comes from. It uses always the one in GL_ARRAY_BUFFER
+		
+	//
+
+		
 
 	/**********************
 	4. Main Loop
@@ -137,21 +275,15 @@ int main(void){
 
 	while( running )
 	{
-		
+		glClear( GL_COLOR_BUFFER_BIT );				// Clear the buffers currently enabled for color writing(BUFFER BIT - can be OR'ed with GL_DEPTH_BUFFER_BIT and GL_STENCIL_BUFFER_BIT if used). 
+				
 
-		// 2b
-		glBindBuffer(GL_ARRAY_BUFFER,positionBufferObject);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,0,0);	
-		
-		//
 
 
 		// OpenGL rendering goes here...
+		
 
-
-		glClear( GL_COLOR_BUFFER_BIT );							// Clear the buffers currently enabled for color writing(BUFFER BIT - can be OR'ed with GL_DEPTH_BUFFER_BIT and GL_STENCIL_BUFFER_BIT if used). 
-
+		glDrawArrays (GL_TRIANGLES, 0, 3);
 		glfwSwapBuffers();										// Swap front and back rendering buffers. GLFW is by default double buffered
 
 		running = !glfwGetKey( GLFW_KEY_ESC ) &&				// Check if ESC key was pressed or window was closed
