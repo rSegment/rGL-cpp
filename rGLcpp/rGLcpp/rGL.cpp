@@ -8,10 +8,11 @@
 
 
 #include <GL3/gl3w.h>		// GL3w must be included before any other OpenGL related headers
-#include <GL/glfw.h>		//Includes gl.h & glu.h
+#include <GL/glfw3.h>		//Includes gl.h only (glu is deprecated)
 #include <glm/glm.hpp>		// OpenGL Mathematics
 
 using namespace glm;
+
 
 GLuint running;
 GLdouble time;
@@ -29,6 +30,9 @@ const GLfloat vertexPositions[]={
 GLuint vao = 0;
 GLuint positionBufferObject;					//This will store the handle to the first buffer object
 
+
+
+GLFWwindow* window;
 
 
 
@@ -100,7 +104,7 @@ std::string readFile(const char *filePath) {
      std::vector<char> vertShaderError(logLength);
      glGetShaderInfoLog(vertShader, logLength, NULL, &vertShaderError[0]);
      std::cout << &vertShaderError[0] << std::endl;
-	 printf("Aqui\n");
+	 
 
      // Compile fragment shader
      std::cout << "Compiling fragment shader." << std::endl;
@@ -164,7 +168,8 @@ int init(void){
 	1.Initializes glfw parts that are not dependent on a window, such as threading, timer and joystick input. or else exits
 	***********************/
 
-	if (!glfwInit()) exit(EXIT_FAILURE);   
+	if (!glfwInit()) 
+		exit(EXIT_FAILURE);   
 
 
 
@@ -193,22 +198,24 @@ int init(void){
 
 	int depthbits, int stencilbits->related to depth_buffer and stencil_buffer but in what way?
 	************************/
+	
+	window = glfwCreateWindow(800, 600, "rGL", NULL, NULL);		// a 800x600 window is created with default color bits (RGB) and alpha,depth and stencil disabled
 
-	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 2); // 2x antialiasing - should be optional in final version
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); // We want OpenGL 3.2
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
-	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
+
+	glfwWindowHint(GLFW_VERSION_MAJOR, 3); // We want OpenGL 3.2
+	glfwWindowHint(GLFW_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
  
 
-
-	if( !glfwOpenWindow( 800,600, 0,0,0,0,0,0, GLFW_WINDOW ) )			// a 800x600 window is created with default color bits (RGB) and alpha,depth and stencil disabled 
+	if(!window)			 
 	{
 		glfwTerminate();
 		exit( EXIT_FAILURE );
 	}
 
-	glfwSetWindowTitle( "rGL" );										//sets window title "rGL"
+	glfwMakeContextCurrent(window);
 
+	
 
 
 	/**********************
@@ -273,7 +280,7 @@ int main(void){
 	4. Main Loop
 	***********************/
 
-	while( running )
+	while(!glfwWindowShouldClose(window)  )
 	{
 		glClear( GL_COLOR_BUFFER_BIT );				// Clear the buffers currently enabled for color writing(BUFFER BIT - can be OR'ed with GL_DEPTH_BUFFER_BIT and GL_STENCIL_BUFFER_BIT if used). 
 				
@@ -282,12 +289,13 @@ int main(void){
 
 		// OpenGL rendering goes here...
 		
-
 		glDrawArrays (GL_TRIANGLES, 0, 3);
-		glfwSwapBuffers();										// Swap front and back rendering buffers. GLFW is by default double buffered
+		
+		
+		glfwSwapBuffers(window);										// Swap front and back rendering buffers. GLFW is by default double buffered
 
-		running = !glfwGetKey( GLFW_KEY_ESC ) &&				// Check if ESC key was pressed or window was closed
-			glfwGetWindowParam( GLFW_OPENED );
+		glfwPollEvents();
+
 	}
 
 
