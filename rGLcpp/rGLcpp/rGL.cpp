@@ -22,13 +22,21 @@ Step 2b
 *********************/
 const GLfloat vertexPositions[]={
     0.75f, 0.75f, 0.0f, 1.0f,
-    0.75f, -0.75f, 0.0f, 1.0f,
+   0.75f, -0.75f, 0.0f, 1.0f,
     -0.75f, -0.75f, 0.0f, 1.0f,
+};
+
+const GLfloat vertexColors[] = {
+	0.75f, 0.75f, 0.0f, 1.0f,
+	0.75f, 0.0f, 0.0f, 1.0f,
+	200.0f, -0.75f, 0.0f, 1.0f,
 };
 
 //Global Variables
 GLuint vao = 0;
 GLuint positionBufferObject;					//This will store the handle to the first buffer object
+
+GLfloat timeLapse;
 
 
 
@@ -255,13 +263,13 @@ int main(void){
 
 
 	
-
+	timeLapse = (float)GetTickCount();
 	init();
 	InitializeVertexBuffer();						//2b. calls VBO creation function
 
 	program = LoadShader("../shaders/vs.glsl", "../shaders/fs.glsl");						//Loads shaders to GPU
 
-	glClearColor(0,1,0,1);							// ClearScreenColor glClearColor( GLfloat   red,   GLfloat   green,   GLfloat   blue,  GLfloat   alpha) values are in 0,1 range 
+	glClearColor(1,1,0,1);							// ClearScreenColor glClearColor( GLfloat   red,   GLfloat   green,   GLfloat   blue,  GLfloat   alpha) values are in 0,1 range 
 
 		// 2b
 
@@ -273,19 +281,30 @@ int main(void){
 	glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,0,0);		// No need to specify from wihich buffer data comes from. It uses always the one in GL_ARRAY_BUFFER
 		
 	//
-
-		
-
+	GLuint loc = glGetUniformLocation(program, "time");
+	
+	float sine;
+	float cosine;
 	/**********************
 	4. Main Loop
 	***********************/
 
 	while(!glfwWindowShouldClose(window)  )
 	{
+		timeLapse = (float)GetTickCount();
+		timeLapse = timeLapse / 1000;
+		printf("%f\n", timeLapse);
+
+		sine = sin(timeLapse);
+		cosine = cos(timeLapse);
+
+		glClearColor(1*cosine, 1*sine, 1*sine*cosine, 1);
+
 		glClear( GL_COLOR_BUFFER_BIT );				// Clear the buffers currently enabled for color writing(BUFFER BIT - can be OR'ed with GL_DEPTH_BUFFER_BIT and GL_STENCIL_BUFFER_BIT if used). 
 				
-
-
+		loc = glGetUniformLocation(program, "time");
+		glUniform1f(loc, timeLapse);
+		
 
 		// OpenGL rendering goes here...
 		
@@ -295,7 +314,8 @@ int main(void){
 		glfwSwapBuffers(window);										// Swap front and back rendering buffers. GLFW is by default double buffered
 
 		glfwPollEvents();
-
+		
+		
 	}
 
 
